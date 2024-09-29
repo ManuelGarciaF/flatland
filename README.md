@@ -1,2 +1,2 @@
 # flatland
-2D world simualtion based on the Flatland book 
+2D world raytracing thing based on the Flatland book
