@@ -1,6 +1,8 @@
 package main
 
 import (
+	"math"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -23,13 +25,13 @@ type Camera struct {
 	World                          *World
 }
 
-func NewCamera(position, direction rl.Vector2, world *World) Camera {
-	return Camera{
+func NewCamera(position, direction rl.Vector2, world *World) *Camera {
+	return &Camera{
 		Position:         position,
 		Direction:        rl.Vector2Normalize(direction), // Ensure its normalized
 		PixelCount:       WINDOW_WIDTH,
 		ViewPortDistance: 1,
-		ViewPortSize:     8, // Gives a ~152 degree FOV
+		ViewPortSize:     2, // Gives a 90 degree FOV (FOV = tg-1(viewportsize/(2*distance)))
 		World:            world,
 	}
 }
@@ -82,7 +84,7 @@ func (c *Camera) getViewPortPixel(pixel int32) rl.Vector2 {
 		normalizedOffset*c.ViewPortSize,
 	)
 
-	viewportCenter := rl.Vector2Scale(c.Direction, c.ViewPortDistance)
+	viewportCenter := rl.Vector2Add(c.Position, rl.Vector2Scale(c.Direction, c.ViewPortDistance))
 
 	// The point we are looking for is obtained by adding the offset to the center
 	return rl.Vector2Add(viewportCenter, offset)
@@ -118,6 +120,6 @@ func checkCollisions(w *World, r Ray) (WorldObject, float32) {
 func calculateColor(obj WorldObject, dist float32) rl.Color {
 	return rl.ColorBrightness(
 		obj.Color(),
-		-dist/VIEW_DISTANCE,
+		-float32(math.Sinh(float64(dist/VIEW_DISTANCE))),
 	)
 }

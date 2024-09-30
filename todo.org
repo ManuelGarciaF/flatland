@@ -1,0 +1,9 @@
+#+title: Flatland TODOs
+
+- [X] Add top down view in another part of the window
+- [X] Fix rotation
+- [X] Add proper movement
+- [ ] Moving objects
+- [X] Prettier fog
+- [ ] Implement ray collision
+- [ ] Goroutines for raytracing

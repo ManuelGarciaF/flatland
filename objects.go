@@ -5,6 +5,7 @@ import rl "github.com/gen2brain/raylib-go/raylib"
 type WorldObject interface {
 	HitBy(ray Ray) (bool, float32) // Returns if it hits the object, then the distance to it.
 	Color() rl.Color
+	Center() rl.Vector2
 }
 
 // Implements WorldObject
@@ -21,6 +22,7 @@ func (p *Polygon) HitBy(ray Ray) (bool, float32) {
 	for currPoint := range p.Points {
 		nextPoint := (currPoint + 1) % len(p.Points)
 
+		// TODO implement this manually
 		var collisionPoint rl.Vector2
 		collide := rl.CheckCollisionLines(
 			ray.Origin,
@@ -51,3 +53,12 @@ func (p *Polygon) HitBy(ray Ray) (bool, float32) {
 }
 
 func (p *Polygon) Color() rl.Color { return p.color }
+
+func (p *Polygon) Center() rl.Vector2 {
+	sum := rl.Vector2{X: 0, Y: 0}
+	for _, p := range p.Points {
+		sum = rl.Vector2Add(sum, p)
+	}
+	pointNum := float32(len(p.Points))
+	return rl.Vector2{X: sum.X/pointNum, Y: sum.Y/pointNum}
+}
