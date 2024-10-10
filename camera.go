@@ -74,7 +74,7 @@ func NewCamera(position, direction rl.Vector2, world *World) *Camera {
 
 func (c *Camera) CastRays() []rl.Color {
 	colors := make([]rl.Color, c.PixelCount)
-	// TODO paralellize this
+	// TODO may be a good place to use goroutines
 	for pixel := int32(0); pixel < c.PixelCount; pixel++ {
 		// Calculate the corresponding coordinates of the viewframe and create a ray
 		// using that as a direction.
@@ -103,7 +103,7 @@ func (c *Camera) getViewPortPixel(pixel int32) rl.Vector2 {
 	 *
 	 *  Viewport
 	 *  ├───────────┤
-	 *        ▲─► basis (length 1)
+	 *        ^ ─> basis (length 1)
 	 *        │
 	 *  	  │ viewportCenter
 	 *  	  │
