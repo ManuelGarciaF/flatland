@@ -67,32 +67,6 @@ func main() {
 	}
 }
 
-func printInfo(c *Camera) {
-	rl.DrawFPS(WINDOW_WIDTH-100, 10)
-
-	// Window titles
-	rl.DrawText("Top Down View", 10, 10, 20, rl.RayWhite)
-	rl.DrawText("First Person View", 10, FIRST_PERSON_VIEW_START_Y+10, 20, rl.RayWhite)
-
-	// Controls
-	rl.DrawText(
-		"WASD to move, Q and E to rotate camera",
-		10,
-		FIRST_PERSON_VIEW_START_Y-30,
-		20,
-		rl.RayWhite,
-	)
-
-	// Print position
-	rl.DrawText(
-		fmt.Sprintf("Pos: X=%.3f, Y=%.3f", c.Position.X, c.Position.Y),
-		10,
-		FIRST_PERSON_VIEW_START_Y-50,
-		10,
-		rl.RayWhite,
-	)
-}
-
 func makeRandomWorld() World {
 	world := make(World, 0, RANDOM_OBJECTS)
 	possibleColors := []rl.Color{rl.Blue, rl.Yellow, rl.Red, rl.Purple, rl.Green}
@@ -161,20 +135,20 @@ func handleMovement(c *Camera) {
 	if rl.IsKeyDown(rl.KeyA) {
 		c.Position = rl.Vector2Add(
 			c.Position,
-			rl.Vector2Scale(perpDirection, -0.15),
+			rl.Vector2Scale(perpDirection, 0.15),
 		)
 	}
 	if rl.IsKeyDown(rl.KeyD) {
 		c.Position = rl.Vector2Add(
 			c.Position,
-			rl.Vector2Scale(perpDirection, 0.15),
+			rl.Vector2Scale(perpDirection, -0.15),
 		)
 	}
 	if rl.IsKeyDown(rl.KeyQ) {
-		c.Direction = rl.Vector2Rotate(c.Direction, 0.05)
+		c.Direction = rl.Vector2Rotate(c.Direction, -0.05)
 	}
 	if rl.IsKeyDown(rl.KeyE) {
-		c.Direction = rl.Vector2Rotate(c.Direction, -0.05)
+		c.Direction = rl.Vector2Rotate(c.Direction, 0.05)
 	}
 
 	// Clamp position
@@ -190,4 +164,30 @@ func handleMovement(c *Camera) {
 	if c.Position.Y > WORLD_SIZE {
 		c.Position.Y = WORLD_SIZE
 	}
+}
+
+func printInfo(c *Camera) {
+	rl.DrawFPS(WINDOW_WIDTH-100, 10)
+
+	// Window titles
+	rl.DrawText("Top Down View", 10, 10, 20, rl.RayWhite)
+	rl.DrawText("First Person View", 10, FIRST_PERSON_VIEW_START_Y+10, 20, rl.RayWhite)
+
+	// Controls
+	rl.DrawText(
+		"WASD to move, Q and E to rotate camera",
+		10,
+		FIRST_PERSON_VIEW_START_Y-30,
+		20,
+		rl.RayWhite,
+	)
+
+	// Print position
+	rl.DrawText(
+		fmt.Sprintf("Pos: X=%.3f, Y=%.3f", c.Position.X, c.Position.Y),
+		10,
+		FIRST_PERSON_VIEW_START_Y-50,
+		10,
+		rl.RayWhite,
+	)
 }

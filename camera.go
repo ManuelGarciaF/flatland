@@ -112,7 +112,7 @@ func (c *Camera) getViewPortPixel(pixel int32) rl.Vector2 {
 	 */
 
 	// Perpendicular vector to the direction to the viewport acts as a basis for the viewport.
-	basis := rl.Vector2Normalize(rl.Vector2{X: c.Direction.Y, Y: -c.Direction.X})
+	basis := rl.Vector2Normalize(rl.Vector2{X: -c.Direction.Y, Y: c.Direction.X})
 
 	// The offset from the center of the viewport to the pixel.
 	centeredPixel := pixel - c.PixelCount/2
