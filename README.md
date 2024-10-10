@@ -6,10 +6,11 @@
 ## Running
 Run the project directly with:
 ``` sh
-$ go run github.com/ManuelGarciaF/flatland@latest
+go run github.com/ManuelGarciaF/flatland@latest
 ```
 
 Or, clone the repository manually and run it:
 ``` sh
-$ go run main.go
+git clone https://github.com/ManuelGarciaF/flatland.git
+go run main.go
 ```
