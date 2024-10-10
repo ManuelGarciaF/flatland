@@ -1,6 +1,10 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"math"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 type WorldObject interface {
 	HitBy(ray Ray) (bool, float32) // Returns if it hits the object, then the distance to it.
@@ -14,6 +18,23 @@ type Polygon struct {
 	color  rl.Color
 }
 
+func NewPolygon(center rl.Vector2, sides int, angle, radius float32, color rl.Color) Polygon {
+	points := make([]rl.Vector2, 0, sides)
+	for i := 0; i < sides; i++ {
+		pointAngle := (float32(i)*2.0*math.Pi)/float32(sides) + angle
+		offset := rl.Vector2Scale(
+			rl.Vector2Rotate(rl.Vector2{X: 1, Y: 0}, pointAngle),
+			radius,
+		)
+		point := rl.Vector2Add(center, offset)
+		points = append(points, point)
+	}
+	return Polygon{
+		Points: points,
+		color:  color,
+	}
+}
+
 func (p *Polygon) HitBy(ray Ray) (bool, float32) {
 	// Stores distances
 	collisions := make([]float32, 0, 2)
@@ -22,18 +43,9 @@ func (p *Polygon) HitBy(ray Ray) (bool, float32) {
 	for currPoint := range p.Points {
 		nextPoint := (currPoint + 1) % len(p.Points)
 
-		// TODO implement this manually
-		var collisionPoint rl.Vector2
-		collide := rl.CheckCollisionLines(
-			ray.Origin,
-			ray.End(),
-			p.Points[currPoint],
-			p.Points[nextPoint],
-			&collisionPoint,
-		)
+		collide, distance := ray.CollidesWithLine(p.Points[currPoint], p.Points[nextPoint])
 
 		if collide {
-			distance := rl.Vector2Distance(ray.Origin, collisionPoint)
 			collisions = append(collisions, distance)
 		}
 	}
@@ -60,5 +72,5 @@ func (p *Polygon) Center() rl.Vector2 {
 		sum = rl.Vector2Add(sum, p)
 	}
 	pointNum := float32(len(p.Points))
-	return rl.Vector2{X: sum.X/pointNum, Y: sum.Y/pointNum}
+	return rl.Vector2{X: sum.X / pointNum, Y: sum.Y / pointNum}
 }

@@ -8,12 +8,48 @@ import (
 
 type Ray struct {
 	Origin    rl.Vector2
-	Direction rl.Vector2
+	Direction rl.Vector2 // The ray's direction, normalized
 }
 
-func (r *Ray) End() rl.Vector2 {
-	return rl.Vector2Add(r.Origin,
-		rl.Vector2Scale(rl.Vector2Subtract(r.Direction, r.Origin), float32(VIEW_DISTANCE)))
+func NewRay(origin, direction rl.Vector2) Ray {
+	return Ray{
+		Origin:    origin,
+		Direction: rl.Vector2Normalize(direction),
+	}
+}
+
+// Returns if there is a collision, and the distance to it.
+func (r *Ray) CollidesWithLine(p1, p2 rl.Vector2) (bool, float32) {
+	// Direction vectors
+	rO := r.Origin
+	rDir := rl.Vector2Normalize(r.Direction)
+	lDir := rl.Vector2Subtract(p2, p1)
+
+	/* We find line intersections by Cramer's rule:
+	 *  ┌               ┐ ┌ ┐   ┌         ┐
+	 *  │rDir.X  -lDir.X│ │t│   │p1.X-rO.x│
+	 *  │rDir.Y  -lDir.Y│ │u│ = │p1.Y-rO.Y│
+	 *  └               ┘ └ ┘   └         ┘
+	 */
+
+	det := -rDir.X*lDir.Y + lDir.X*rDir.Y
+
+	// If the determinant is zero, the equations are linearly dependant, meaning they are parallel.
+	parallel := math.Abs(float64(det)) <= 1e-6
+	if !parallel {
+
+		// Solve the system of equations
+		t := (-(p1.X-rO.X)*lDir.Y + lDir.X*(p1.Y-rO.Y)) / det
+		u := (rDir.X*(p1.Y-rO.Y) - (p1.X-rO.X)*rDir.Y) / det
+
+		// The collision is valid only if t is positive and u is between 0 and 1
+		if t >= 0 && u >= 0 && u <= 1 {
+			// The distance is just t (the ray's parameter), since direction is normalized
+			return true, t
+		}
+	}
+
+	return false, -1
 }
 
 // Currently, camera only looks to the +y direction
@@ -42,9 +78,11 @@ func (c *Camera) CastRays() []rl.Color {
 	for pixel := int32(0); pixel < c.PixelCount; pixel++ {
 		// Calculate the corresponding coordinates of the viewframe and create a ray
 		// using that as a direction.
+		// Substract the camera position so its a direction vector.
+		dir := rl.Vector2Subtract(c.getViewPortPixel(pixel), c.Position)
 		ray := Ray{
 			Origin:    c.Position,
-			Direction: c.getViewPortPixel(pixel),
+			Direction: dir,
 		}
 
 		obj, dist := checkCollisions(c.World, ray)
@@ -120,6 +158,6 @@ func checkCollisions(w *World, r Ray) (WorldObject, float32) {
 func calculateColor(obj WorldObject, dist float32) rl.Color {
 	return rl.ColorBrightness(
 		obj.Color(),
-		-float32(math.Sinh(float64(dist/VIEW_DISTANCE))),
+		-dist/VIEW_DISTANCE,
 	)
 }
