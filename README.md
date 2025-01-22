@@ -1,5 +1,5 @@
 # Flatland
-2D world raytracing thing, inspired on the Flatland book.
+2D world, 1D view raytracing thing, inspired on the Flatland book.
 
 ![screenshot](./screenshot.png)
 
